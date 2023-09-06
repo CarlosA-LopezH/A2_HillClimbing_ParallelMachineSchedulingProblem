@@ -1,0 +1,17 @@
+El benchmark cuenta con 1400 instancias de prueba, las instancias pueden tener 10, 20, 30, 40 o 50 máquinas y 100, 200, 500 o 1000 trabajos.
+
+Las instancias están distribuidas en 7 conjuntos, cada uno con 200 instancias (10 instancias por cada combinación de máquinas y trabajos; es decir, 10 instancias con 10 máquinas y 100 trabajos, 10 instancias con 10 máquinas y 200 trabajos, 10 instancias con 10 máquinas y 500 trabajos, 10 instancias con 10 máquinas y 1000 trabajos, y así sucesivamente). 
+
+
+Por otro lado, los tiempos de procesamiento fueron generados de la siguiente forma:    
+	Cinco conjuntos fueron generados utilizando una distribución uniforme en los rangos (1, 100), (10, 100), (100, 120), (100, 200) y (1000, 1100).
+    	En un conjunto, los trabajos están correlacionados y en el último conjunto las máquinas están correlacionadas. 
+
+
+En el benchmark, cada carpeta (que representa un conjunto) contiene un documento "list.txt" donde: 
+	La primera columna contiene el identificador de cada instancia (de 1011 a 1020 son instancias con 1000 trabajos y 10 máquinas, de 1021 a 1030 son instancias con 1000 trabajos y 20 máquinas y así sucesivamente).
+ 	La segunda columna contiene la solución encontrada (makespan o Cmax) en dos horas de CPLEX.
+
+
+Una instancia está representada por una matriz, donde cada columna desde 1 hasta m (número de máquinas) representa una máquina y cada fila desde 1 hasta n (número de trabajos) representa un trabajo. Así, cada celda incluye el tiempo de procesamiento que requiere cada máquina (indicada en cada columna) para procesar cada trabajo (indicado en cada fila).
+Cabe destacar que las instancias tienen m columnas de más, ya que para separar cada máquina hay una columna extra. Por lo tanto, al leer la instancia es necesario descartar dichas columnas.
