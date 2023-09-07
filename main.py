@@ -96,12 +96,11 @@ def neighborhood_mapping(solution, m, i_max, c_max, data, c):
 
 if __name__ == '__main__':
     # Define max iterarion
-    max_iteration = 1
+    max_iteration = 5
     # Testing creation of new solution
     folder_path = 'Instances/Conjunto'
     # Get all instances in folder
     all_instances = listdir('Instances/Conjunto')
-
     # Drop 'list.txt'
     all_instances.remove('list.txt')
     # For testing, only use instance 111.txt [5]
