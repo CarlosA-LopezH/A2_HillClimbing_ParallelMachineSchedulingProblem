@@ -1,0 +1,2 @@
+Design and implementation of the Hill Scaling Algorithm for the problem 
+and representation scheme selected in class. DELIVERY: September 11, 2023

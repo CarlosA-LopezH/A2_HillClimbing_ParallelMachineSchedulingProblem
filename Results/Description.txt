@@ -1,0 +1,5 @@
+## Name_file = Instance_R
+Iteration = I
+Initial Solution
+Final Solution
+Cmax - C's - C_i
