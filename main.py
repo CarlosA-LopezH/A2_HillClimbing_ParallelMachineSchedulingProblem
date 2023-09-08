@@ -143,7 +143,7 @@ def neighborhood_mapping_new(solution, m, i_max, c_max, data, c, moves, good_nei
 
 if __name__ == '__main__':
     # Define max iterarion
-    max_iteration = 2
+    max_iteration = 3
     history_cmax_iterations = [0 for iteration_x in range(max_iteration)]
     history_time_iterations = [0 for iteration_x in range(max_iteration)]
     # Testing creation of new solution
@@ -193,13 +193,26 @@ if __name__ == '__main__':
             print_results.write('\t--------------------------------------------------------\t\n')
             print_results.write('\t--------------------------------------------------------\t\n')
             print_results.write(f'Cmax: {history_cmax_iterations}\n')
-            print_results.write(
-                f'Cmax mean: {mean(history_cmax_iterations)} - Cmax stdev: {stdev(history_cmax_iterations)} - Cmax '
-                f'median: {median(history_cmax_iterations)}\n')
+            mean_value = mean(history_cmax_iterations)
+            stdev_value = stdev(history_cmax_iterations)
+            median_value = median(history_cmax_iterations)
+            max_value = max(history_cmax_iterations)
+            min_value = min(history_cmax_iterations)
+            print_results.write(f'Cmax mean: {mean_value} - Cmax stdev: {stdev_value}\n')
+            print_results.write(f'Cmax MAX: {max_value, history_cmax_iterations.index(max_value)} ')
+            print_results.write(f'Cmax median: {median_value, history_cmax_iterations.index(median_value)} ')
+            print_results.write(f'Cmax min: {min_value, history_cmax_iterations.index(min_value)}\n\n')
+
             print_results.write(f'Times: {history_time_iterations}\n')
-            print_results.write(
-                f'Time mean: {mean(history_time_iterations)} - Time stdev: {stdev(history_time_iterations)} - Time '
-                f'median: {median(history_time_iterations)}')
+            mean_value = mean(history_time_iterations)
+            stdev_value = stdev(history_time_iterations)
+            median_value = median(history_time_iterations)
+            max_value = max(history_time_iterations)
+            min_value = min(history_time_iterations)
+            print_results.write(f'Time mean: {mean_value} - Time stdev: {stdev_value}\n')
+            print_results.write(f'Time MAX: {max_value, history_time_iterations.index(max_value)} ')
+            print_results.write(f'Time median: {median_value, history_time_iterations.index(median_value)}')
+            print_results.write(f'Time min: {min_value, history_time_iterations.index(min_value)}')
 
     # neighbor = deepcopy(a)
     # for y, task in enumerate(neighbor[i_max][:]):
