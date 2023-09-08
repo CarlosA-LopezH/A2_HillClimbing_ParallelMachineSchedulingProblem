@@ -25,48 +25,65 @@ def get_instance(name, folder_dir):
 
 
 def new_solution(m, n):
+    # Create a Solution array of Machines (m) with empty arrays of Tasks(n)
     solution = [[] for i in range(m)]
-
+    # Fill machines with random tasks
     for i in range(n):
         random_machine = randint(0, m - 1)
         solution[random_machine].append(i)
-
+    # Return solution
     return solution
 
 
 def get_cvalue(m_i, n_j, data):
+    # Return de value of a given task on a given machine
     return data[n_j][m_i]
 
 
 def generate_cvalues(m, solution, data):
+    # Generate a zero C array
     c_values = [0 for i in range(m)]
-
+    # Fill the C values of each machine
+    # Iterate over the machines
     for i, machine in enumerate(solution):
+        # Iterate over the task of a machine
         for j in machine:
+            # Update the value of C of the machine with the task
             c_values[i] = c_values[i] + get_cvalue(i, j, data)
+    # Return C array
     return c_values
 
 
 def get_cmax(c_values):
+    # Get the Cmax
     max_val = max(c_values)
+    # Return Cmax and its position
     return max_val, c_values.index(max_val)
 
 
 def count_similars(values, value):
+    # Start the count in 0
     count = 0
+    # Iterate over the C values
     for v in values:
+        # If C value is Cmax, add 1
         if v == value:
             count += 1
+    # Return the count minus 1 to eliminate the first occurrence
     return count - 1
 
 
 def fitness(c_values):
+    # Get the Cmax value and its position
     part_integer, index = get_cmax(c_values)
+    # Count the occurrences of Cmax
     part_decimal = count_similars(c_values, part_integer) / 10
+    # Report the fitness and the index of Cmax
     return part_integer + part_decimal, index
 
 
 def neighborhood_mapping(solution, m, i_max, c_max, data, c):
+    # Not in use, only for references.............................
     # best_neighbour = []
     # best_i_max = 0
     # best_c_max = c_max
@@ -97,43 +114,71 @@ def neighborhood_mapping(solution, m, i_max, c_max, data, c):
         return True, solution, c, c_max, i_max
 
 
-def neighbour_evaluation_sw10(cmax, cs, i_max, i_target, task, data):
+def neighbour_evaluation_sw10(c_max, cs, i_max, target, task, data):
+    # Set update to false
     update = False
+    # Build an array with C values
     neighbour_c = [c for c in cs]
-    neighbour_c[i_max] = cs[i_max] - get_cvalue(i_max, task, data)
-    neighbour_c[i_target] = cs[i_target] + get_cvalue(i_target, task, data)
+    # Subtract the current value of C in the index of Cmax minus the value of the task
+    neighbour_c[i_max] = neighbour_c[i_max] - get_cvalue(i_max, task, data)
+    # Add the current value of C in the target plus the value of the task
+    neighbour_c[target] = neighbour_c[target] + get_cvalue(target, task, data)
+    # Get the new fitness of C values
     new_c_max, _ = fitness(neighbour_c)
-    if new_c_max < cmax:
+    # If the new Cmax is less than the old Cmax, then it is better and must update
+    if new_c_max < c_max:
+        # Set update to true to update the solution
         update = True
+    # Return if the update should go or not and the value of Cmax
     return update, new_c_max
 
 
 def neighbour_evaluation_sw20(cmax, cs, i_max, target_1, target_2, task_1, task_2, data):
+    # Set update to false
     update = False
+    # Build an array with C values
     neighbour_c = [c for c in cs]
+    # Subtract the current value of C in the index of Cmax minus the value of the task 1
     neighbour_c[i_max] = neighbour_c[i_max] - get_cvalue(i_max, task_1, data)
+    # Subtract the current value of C in the index of Cmax minus the value of the task 2
     neighbour_c[i_max] = neighbour_c[i_max] - get_cvalue(i_max, task_2, data)
+    # Add the current value of C in the target plus the value of the task 1
     neighbour_c[target_1] = neighbour_c[target_1] + get_cvalue(target_1, task_1, data)
+    # Add the current value of C in the target plus the value of the task 2
     neighbour_c[target_2] = neighbour_c[target_2] + get_cvalue(target_2, task_2, data)
+    # Get the new fitness of C values
     new_c_max, _ = fitness(neighbour_c)
+    # If the new Cmax is less than the old Cmax, then it is better and must update
     if new_c_max < cmax:
+        # Set update to true to update the solution
         update = True
+        # Return if the update should go or not and the value of Cmax
     return update, new_c_max
 
 
 def swap_1_0(solution, origin, target, task):
+    # Build a solution identical to the original
     swaped_solution = [m for m in solution]
+    # Remove the task from the origin machine
     swaped_solution[origin].remove(task)
+    # Insert the task in the target machine
     swaped_solution[target] = swaped_solution[target] + [task]
+    # Return the new solution
     return swaped_solution
 
 
 def swap_2_0(solution, origin, target_1, target_2, task_1, task_2):
+    # Build a solution identical to the original
     swaped_solution = [m for m in solution]
+    # Remove the task 1 from the origin machine
     swaped_solution[origin].remove(task_1)
+    # Insert the task 1 in the target 1 machine
     swaped_solution[target_1] = swaped_solution[target_1] + [task_1]
+    # Remove the task 2 from the origin machine
     swaped_solution[origin].remove(task_2)
+    # Insert the task 2 in the target 2 machine
     swaped_solution[target_2] = swaped_solution[target_2] + [task_2]
+    # Return the new solution
     return swaped_solution
 
 
