@@ -1,9 +1,9 @@
 import os
-from numpy import zeros, uint8
+from numpy import uint8
 from pandas import read_csv
 from os import getcwd, listdir
 from random import seed, randint
-from copy import copy, deepcopy
+from copy import deepcopy
 from time import time
 from statistics import mean, stdev, median
 
@@ -182,7 +182,7 @@ def swap_2_0(solution, origin, target_1, target_2, task_1, task_2):
     return swaped_solution
 
 
-def neighborhood_mapping_sw10(solution, m, i_max, c_max, data, c, moves, good_neighbours):
+def neighborhood_mapping_sw10(solution, m, i_max, c_max, data, c, moves, neighbours):
     # Create best target machine, task and cmax variables
     best_target = 0
     best_task = 0
@@ -196,13 +196,13 @@ def neighborhood_mapping_sw10(solution, m, i_max, c_max, data, c, moves, good_ne
         for m_i in range(m):
             # Skip the origin machine to avoid repetitions
             if m_i != i_max:
+                # Update the counter for nieghbours
+                neighbours += 1
                 # Evaluate the neighbour
                 update, new_cmax = neighbour_evaluation_sw10(best_cmax, c, i_max, m_i, task, data)
-                print('Cmax: ', c_max, 'Best: ', best_cmax, 'Good N', good_neighbours, 'Moves: ', moves)
+                print('Cmax: ', c_max, 'Best: ', best_cmax, 'Good N', neighbours, 'Moves: ', moves)
                 # if the neighbour is better, update the best values
                 if update:
-                    # Update the counter for improvements
-                    good_neighbours += 1
                     # Best target is the current machine
                     best_target = m_i
                     # Best task is the current task
@@ -222,10 +222,10 @@ def neighborhood_mapping_sw10(solution, m, i_max, c_max, data, c, moves, good_ne
         # Get the Cmax and its index
         c_max, i_max = fitness(c)
     # Return results
-    return found_solution, solution, c, c_max, i_max, moves, good_neighbours
+    return found_solution, solution, c, c_max, i_max, moves, neighbours
 
 
-def neighborhood_mapping_sw20(solution, m, i_max, c_max, data, c, moves, good_neighbours):
+def neighborhood_mapping_sw20(solution, m, i_max, c_max, data, c, moves, neighbours):
     # Create best target machines, tasks and cmax variables
     best_target = (0, 0)
     best_task = (0, 0)
@@ -244,13 +244,13 @@ def neighborhood_mapping_sw20(solution, m, i_max, c_max, data, c, moves, good_ne
                     for m_y in range(m):
                         # Skip the origin machine to avoid repetitions
                         if m_y != i_max:
+                            # Update the counter for improvements
+                            neighbours += 1
                             # Evaluate the neighbour
                             update, new_cmax = neighbour_evaluation_sw20(best_cmax, c, i_max, m_x, m_y, solution[i_max][x], solution[i_max][y], data)
-                            print('Cmax: ', c_max, 'Best: ', best_cmax, 'Good N', good_neighbours, 'Moves: ', moves)
+                            print('Cmax: ', c_max, 'Best: ', best_cmax, 'Good N', neighbours, 'Moves: ', moves)
                             # if the neighbour is better, update the best values
                             if update:
-                                # Update the counter for improvements
-                                good_neighbours += 1
                                 # Best targets are the current machines
                                 best_target = (m_x, m_y)
                                 # Best tasks are the current task
@@ -271,12 +271,13 @@ def neighborhood_mapping_sw20(solution, m, i_max, c_max, data, c, moves, good_ne
         # Get the Cmax and its index
         c_max, i_max = fitness(c)
     # Return results
-    return found_solution, solution, c, c_max, i_max, moves, good_neighbours
+    return found_solution, solution, c, c_max, i_max, moves, neighbours
 
 
 if __name__ == '__main__':
-    # Define max iterarion
-    max_iteration = 3
+    # Define max iteration
+    max_iteration = 11
+    # Initialize arrays to save cmax & time values
     history_cmax_iterations = [0 for iteration_x in range(max_iteration)]
     history_time_iterations = [0 for iteration_x in range(max_iteration)]
     # Testing creation of new solution
@@ -286,45 +287,59 @@ if __name__ == '__main__':
     # Drop 'list.txt'
     all_instances.remove('list.txt')
     # For testing, only use instance 111.txt [5]
-    for instance in [all_instances[5]]:
+    # Go through al instances
+    for instance in all_instances:
+        # Get the # of machines, task and the data for the instance
         machines, tasks, data = get_instance(instance, folder_path)
-
-        with open(f'Results/{instance[:-4]}_R-T.txt', 'w') as print_results:
+        # Create a file to save the results (per instance)
+        with open(f'Results/{instance[:-4]}_R-T-C.txt', 'w') as print_results:
             # Start the iteration process
             for iteration in range(max_iteration):
                 print(instance)
+                # Set the values of total neighbours and movements to 0
                 total_neighbours = 0
                 total_movements = 0
+                # Create the array to store all cmaxs
                 history_cmax = []
+                # Start the timer
                 start_time = time()
                 # Create a solution
                 current_solution = new_solution(machines, tasks)
+                # Write in file the iteration number & the initial solution
                 print_results.write(f'Iteration: {iteration}\n')
                 print_results.write(f'Initial solution: {current_solution}\n')
                 # Generate all de C values of solution
                 c = generate_cvalues(machines, current_solution, data)
                 # Get the Cmax and it indexes
                 cmax, i_max = fitness(c)
-                # Set the stuck indicator to False
+                # Set the stuck indicator to True
                 not_stuck = True
+                # If a new solutions has been found, continue
                 while not_stuck:
-                    not_stuck, current_solution, c, cmax, i_max, total_movements, total_neighbours = neighborhood_mapping_sw20(
+                    # Map the neighbourhood
+                    not_stuck, current_solution, c, cmax, i_max, total_movements, total_neighbours = neighborhood_mapping_sw10(
                         current_solution, machines, i_max,
                         cmax,
                         data, c, total_movements, total_neighbours)
+                    # Store the current cmax
                     history_cmax.append(cmax)
+                # Get the time of execution
                 dt = time() - start_time
+                # Report solution
                 print('Iteration: ', iteration, 'Solution:', current_solution, 'Cs:', c, 'Cmax:', cmax, 'C_i:', i_max,
                       'Time:', dt)
+                # Write the results of the iteration
                 print_results.write(f'Final solution: {current_solution}\n')
                 print_results.write(f"Cmax: {cmax} - C's: {c} - C_i: {i_max} - Time: {dt}\n")
                 print_results.write(f"Total movements: {total_movements} - Total neighbours: {total_neighbours} \n")
                 print_results.write(f"Cmaxs: {history_cmax}\n")
                 print_results.write('\t--------------\t\n')
+                # Store the cmax and time of the iteration
                 history_cmax_iterations[iteration] = cmax
                 history_time_iterations[iteration] = dt
             print_results.write('\t--------------------------------------------------------\t\n')
             print_results.write('\t--------------------------------------------------------\t\n')
+            # Write the overall results of cmax of all iterations
             print_results.write(f'Cmax: {history_cmax_iterations}\n')
             mean_value = mean(history_cmax_iterations)
             stdev_value = stdev(history_cmax_iterations)
@@ -335,7 +350,7 @@ if __name__ == '__main__':
             print_results.write(f'Cmax MAX: {max_value, history_cmax_iterations.index(max_value)} ')
             print_results.write(f'Cmax median: {median_value, history_cmax_iterations.index(median_value)} ')
             print_results.write(f'Cmax min: {min_value, history_cmax_iterations.index(min_value)}\n\n')
-
+            # Write the overall results of time of all iterations
             print_results.write(f'Times: {history_time_iterations}\n')
             mean_value = mean(history_time_iterations)
             stdev_value = stdev(history_time_iterations)
@@ -346,51 +361,3 @@ if __name__ == '__main__':
             print_results.write(f'Time MAX: {max_value, history_time_iterations.index(max_value)} ')
             print_results.write(f'Time median: {median_value, history_time_iterations.index(median_value)}')
             print_results.write(f'Time min: {min_value, history_time_iterations.index(min_value)}')
-
-    # neighbor = deepcopy(a)
-    # for y, task in enumerate(neighbor[i_max][:]):
-    #     print('Task', task, 'index', y)
-    #     neighbor[i_max].remove(task)
-    #     for m in range(machines):
-    #         if m != i_max:
-    #             neighbor[m] = neighbor[m] + [task]
-    #             print('New Neighbor', neighbor)
-    #             neighbor[m] = a[m]
-    #
-    #     neighbor[i_max].insert(y, task)
-    #     print('Original', a)
-    #     print(neighbor)
-
-    # Testing reading and getting instance information
-    # # Creating Matrix of data
-    # folder_path = 'Instances/Conjunto'
-    # # Get all instances in folder
-    # all_instances = listdir('Instances/Conjunto')
-    #
-    # # Drop 'list.txt'
-    # all_instances.remove('list.txt')
-    # for name_instance in all_instances:
-    #     # Get #Machines & #Taks and data info from function.
-    #     machines, tasks, data = get_instance(name_instance, folder_path)
-    #     print(name_instance)
-    #     print(machines, tasks)
-    #     print(data)
-
-# Tests ---------------------------------------------
-# Know all the file names on dir
-# all_instances = listdir('Instances/Conjunto')
-# print(all_instances)
-
-#
-# # Getting #Machines & #Taks from file name
-# m = int(all_instances[0][-5]) * 10
-# n = int(all_instances[0][:-6]) * 100
-# print(m, n)
-#
-# print(all_instances[0])
-#
-# data = read_csv(f'Instances/Conjunto/{all_instances[0]}', sep="\t", skiprows=[0, 1], header=None)
-# print(data)
-# data.drop(data.columns[[0] + [i for i in range(1, (m * 2) + 2, 2)]], inplace=True, axis=1)
-# print(data)
-# print(data.to_numpy(dtype=uint8))
