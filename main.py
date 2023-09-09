@@ -6,6 +6,7 @@ from random import seed, randint
 from copy import deepcopy
 from time import time
 from statistics import mean, stdev, median
+import matplotlib
 
 seed(0)
 
