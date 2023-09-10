@@ -11,6 +11,36 @@ import matplotlib
 seed(0)
 
 
+class Solution:
+    def __init__(self, machines, tasks, data):
+        # Initialize variables
+        self.fitness = 0.0
+        self.imax = 0
+        self.cmax = 0
+        self.cs = []
+        self.solution = []
+        self.m = machines
+        self.n = tasks
+        self.data = data
+        self.neighbours = 0
+        self.movements = -1
+
+        self.update_solution(new_solution(self.m, self.n))
+
+    def update_solution(self, solution):
+        self.solution = solution
+        self.cs = generate_cvalues(self.m, self.solution, self.data)
+        self.cmax, self.imax = get_cmax(self.cs)
+        self.fitness, _ = fitness(self.cs)
+        self.movements += 1
+
+    def cmax_machine(self):
+        return self.solution[self.imax]
+
+    def print_state(self, best_cmax):
+        print('Cmax: ', self.fitness, 'Best: ', best_cmax, 'Neighbours: ', self.neighbours, 'Moves: ', self.movements)
+
+
 def get_instance(name, folder_dir):
     # Getting #Machines (m) & #Taks (n) from file name
     m = int(name[-6]) * 10
@@ -190,7 +220,6 @@ def neighborhood_mapping_sw10(solution, m, i_max, c_max, data, c, moves, neighbo
     best_cmax = c_max
     # Set found_solution to false. Only change when/if a better neighbour is found.
     found_solution = False
-
     # Iterate over the task of the machine with Cmax
     for task in solution[i_max]:
         # Iterate over all machines
